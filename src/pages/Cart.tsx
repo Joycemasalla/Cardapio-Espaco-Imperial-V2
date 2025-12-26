@@ -28,7 +28,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const { items, updateQuantity, removeItem, clearCart, total } = useCart();
   const { data: settings } = useSettings();
-  
+
   const [orderType, setOrderType] = useState<OrderType>('delivery');
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -36,17 +36,17 @@ export default function Cart() {
   const [addressComplement, setAddressComplement] = useState('');
   const [tableNumber, setTableNumber] = useState('');
   const [notes, setNotes] = useState('');
-  
+
   // Payment
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('pix');
   const [needChange, setNeedChange] = useState(false);
   const [changeAmount, setChangeAmount] = useState('');
-  
+
   // Edit mode for saved data
   const [isEditing, setIsEditing] = useState(false);
   const [hasSavedData, setHasSavedData] = useState(false);
   const [pixCopied, setPixCopied] = useState(false);
-  
+
   // Order flow modals
   const [showPreview, setShowPreview] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -144,13 +144,13 @@ export default function Cart() {
 
   const formatOrderMessage = (orderNum: string) => {
     const separator = '━━━━━━━━━━━━━━━━━━━━';
-    
+
     let message = `🍔 *${settings?.store_name || 'Espaço Imperial'}*\n`;
     message += `${separator}\n\n`;
-    
+
     message += `📋 *PEDIDO #${orderNum}*\n`;
     message += `🕐 ${formatDateTime()}\n\n`;
-    
+
     message += `${separator}\n`;
     message += `👤 *CLIENTE*\n`;
     message += `${separator}\n`;
@@ -159,7 +159,7 @@ export default function Cart() {
       message += `WhatsApp: ${customerPhone}\n`;
     }
     message += `\n`;
-    
+
     message += `${separator}\n`;
     message += `🛒 *ITENS DO PEDIDO*\n`;
     message += `${separator}\n`;
@@ -170,7 +170,7 @@ export default function Cart() {
       message += `   R$ ${(price * item.quantity).toFixed(2)}\n`;
     });
     message += `\n`;
-    
+
     message += `${separator}\n`;
     if (orderType === 'delivery') {
       message += `🚚 *ENTREGA*\n`;
@@ -185,7 +185,7 @@ export default function Cart() {
       message += `🏪 *RETIRADA NO LOCAL*\n`;
       message += `${separator}\n\n`;
     }
-    
+
     message += `${separator}\n`;
     message += `💰 *VALORES*\n`;
     message += `${separator}\n`;
@@ -194,38 +194,38 @@ export default function Cart() {
       message += `Entrega: R$ ${deliveryFee.toFixed(2)}\n`;
     }
     message += `*TOTAL: R$ ${finalTotal.toFixed(2)}*\n\n`;
-    
+
     message += `${separator}\n`;
     message += `💳 *PAGAMENTO*\n`;
     message += `${separator}\n`;
     message += `${formatPaymentMethod()}\n`;
-    
+
     if (paymentMethod === 'pix') {
-      message += `\n⚠️ _Envie o comprovante PIX nesta conversa_\n`;
+      message += `\n _Envie o comprovante PIX nesta conversa_\n`;
     }
-    
+
     if (notes) {
       message += `\n${separator}\n`;
       message += `📝 *OBSERVAÇÕES*\n`;
       message += `${separator}\n`;
       message += `${notes}\n`;
     }
-    
+
     message += `\n${separator}\n`;
     message += `✨ Obrigado pela preferência!\n`;
     message += `${separator}`;
-    
+
     return message;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!customerName) {
       toast.error('Preencha seu nome');
       return;
     }
-    
+
     if (orderType === 'delivery' && !address) {
       toast.error('Preencha o endereço de entrega');
       return;
@@ -248,8 +248,19 @@ export default function Cart() {
 
     const whatsappNumber = settings?.whatsapp_number || '5511999999999';
     const message = encodeURIComponent(formatOrderMessage(orderNumber));
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
-    
+
+    // Usa a API do WhatsApp Web que suporta melhor emojis
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    let whatsappUrl;
+    if (isMobile) {
+      // WhatsApp app no mobile
+      whatsappUrl = `whatsapp://send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
+    } else {
+      // WhatsApp Web no desktop
+      whatsappUrl = `https://web.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
+    }
+
     window.open(whatsappUrl, '_blank');
     setShowPreview(false);
     clearCart();
@@ -291,12 +302,12 @@ export default function Cart() {
             const price = getItemPrice(item);
             const name = getItemName(item);
             const itemKey = generateCartItemKey(item.product, item.variation, item.secondFlavor);
-            
+
             return (
               <div key={itemKey} className="bg-card border border-border rounded-lg p-4 flex gap-4">
                 {item.product.image_url ? (
-                  <img 
-                    src={item.product.image_url} 
+                  <img
+                    src={item.product.image_url}
                     alt={item.product.name}
                     className="w-20 h-20 object-cover rounded-lg"
                   />
@@ -305,11 +316,11 @@ export default function Cart() {
                     <span className="text-2xl">🍽️</span>
                   </div>
                 )}
-                
+
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground">{name}</h3>
                   <p className="text-primary font-bold">R$ {(price * item.quantity).toFixed(2)}</p>
-                  
+
                   <div className="flex items-center gap-2 mt-2">
                     <Button
                       size="icon"
@@ -348,8 +359,8 @@ export default function Cart() {
           {/* Order Type */}
           <div className="space-y-3">
             <Label className="text-base font-semibold text-foreground">Como você quer receber?</Label>
-            <RadioGroup 
-              value={orderType} 
+            <RadioGroup
+              value={orderType}
               onValueChange={(v) => setOrderType(v as OrderType)}
               className="grid grid-cols-3 gap-3"
             >
@@ -391,10 +402,10 @@ export default function Cart() {
             <div className="flex items-center justify-between">
               <Label className="text-base font-semibold text-foreground">Seus dados</Label>
               {hasSavedData && !isEditing && (
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setIsEditing(true)}
                   className="gap-1 text-muted-foreground"
                 >
@@ -403,13 +414,13 @@ export default function Cart() {
                 </Button>
               )}
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground">Seu nome *</Label>
-                <Input 
-                  id="name" 
-                  value={customerName} 
+                <Input
+                  id="name"
+                  value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="João Silva"
                   required
@@ -419,9 +430,9 @@ export default function Cart() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-foreground">WhatsApp (opcional)</Label>
-                <Input 
-                  id="phone" 
-                  value={customerPhone} 
+                <Input
+                  id="phone"
+                  value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   placeholder="(11) 99999-9999"
                   disabled={hasSavedData && !isEditing}
@@ -436,9 +447,9 @@ export default function Cart() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="address" className="text-foreground">Endereço *</Label>
-                <Input 
-                  id="address" 
-                  value={address} 
+                <Input
+                  id="address"
+                  value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Rua, número, bairro"
                   required
@@ -448,9 +459,9 @@ export default function Cart() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="complement" className="text-foreground">Complemento</Label>
-                <Input 
-                  id="complement" 
-                  value={addressComplement} 
+                <Input
+                  id="complement"
+                  value={addressComplement}
                   onChange={(e) => setAddressComplement(e.target.value)}
                   placeholder="Apartamento, bloco, referência"
                   disabled={hasSavedData && !isEditing}
@@ -464,8 +475,8 @@ export default function Cart() {
           {/* Payment Method */}
           <div className="space-y-3">
             <Label className="text-base font-semibold text-foreground">Forma de Pagamento</Label>
-            <RadioGroup 
-              value={paymentMethod} 
+            <RadioGroup
+              value={paymentMethod}
               onValueChange={(v) => {
                 setPaymentMethod(v as PaymentMethod);
                 if (v !== 'cash') {
@@ -516,7 +527,7 @@ export default function Cart() {
                     <QrCode className="h-5 w-5" />
                     <span>Chave PIX para pagamento</span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <div className="flex-1 bg-background border border-border rounded-lg p-3 font-mono text-sm text-foreground break-all">
                       {settings.pix_key}
@@ -551,7 +562,7 @@ export default function Cart() {
                         ⚠️ ATENÇÃO
                       </p>
                       <p className="text-sm text-foreground">
-                        Após realizar o pagamento, <strong>envie o comprovante PIX</strong> junto com seu pedido pelo WhatsApp para confirmar!
+                        Após realizar o pagamento, <strong>envie o comprovante PIX</strong>, junto com seu pedido pelo WhatsApp para confirmar!
                       </p>
                     </div>
                   </div>
@@ -564,8 +575,8 @@ export default function Cart() {
               <div className="space-y-3 mt-4 p-4 bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-4">
                   <Label className="text-foreground">Precisa de troco?</Label>
-                  <RadioGroup 
-                    value={needChange ? 'yes' : 'no'} 
+                  <RadioGroup
+                    value={needChange ? 'yes' : 'no'}
                     onValueChange={(v) => setNeedChange(v === 'yes')}
                     className="flex gap-4"
                   >
@@ -579,11 +590,11 @@ export default function Cart() {
                     </div>
                   </RadioGroup>
                 </div>
-                
+
                 {needChange && (
                   <div className="space-y-2">
                     <Label htmlFor="changeAmount" className="text-foreground">Troco para quanto?</Label>
-                    <Input 
+                    <Input
                       id="changeAmount"
                       type="number"
                       value={changeAmount}
@@ -600,9 +611,9 @@ export default function Cart() {
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes" className="text-foreground">Observações</Label>
-            <Textarea 
-              id="notes" 
-              value={notes} 
+            <Textarea
+              id="notes"
+              value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Alguma observação sobre seu pedido?"
               rows={3}
@@ -636,7 +647,7 @@ export default function Cart() {
           {/* WhatsApp Help */}
           <p className="text-center text-sm text-muted-foreground">
             Teve algum problema?{' '}
-            <a 
+            <a
               href={`https://wa.me/${settings?.whatsapp_number || '5511999999999'}`}
               target="_blank"
               rel="noopener noreferrer"
