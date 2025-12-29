@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Save, Plus, Trash2, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { Category } from '@/types';
+import { ImageUpload } from './ImageUpload';
 import { useUpdateCategory } from '@/hooks/useCategories';
 import { 
   useCategoryAddons, 
@@ -161,19 +162,13 @@ export function CategoryEditModal({ category, open, onOpenChange }: CategoryEdit
             />
           </div>
 
-          {/* URL da Imagem */}
-          <div>
-            <Label className="text-foreground">URL da Imagem</Label>
-            <Input
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              className="bg-background border-border text-foreground"
-              placeholder="https://..."
-            />
-            {formData.image_url && (
-              <img src={formData.image_url} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded-lg" />
-            )}
-          </div>
+          {/* Imagem da Categoria */}
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            folder="categories"
+            label="Imagem da Categoria"
+          />
 
           {/* Ordem de exibição */}
           <div>

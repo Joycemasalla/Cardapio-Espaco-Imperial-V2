@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Plus, Trash2, Save } from 'lucide-react';
 import { toast } from 'sonner';
+import { ImageUpload } from './ImageUpload';
 import { Product, Category, ProductVariation } from '@/types';
 import { useUpdateProduct } from '@/hooks/useProducts';
 import { useProductVariations, useCreateProductVariation, useUpdateProductVariation, useDeleteProductVariation } from '@/hooks/useProductVariations';
@@ -163,19 +164,13 @@ export function ProductEditModal({ product, categories, open, onOpenChange }: Pr
             </Select>
           </div>
 
-          {/* URL da Imagem */}
-          <div>
-            <Label className="text-foreground">URL da Imagem</Label>
-            <Input
-              value={formData.image_url}
-              onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-              className="bg-background border-border text-foreground"
-              placeholder="https://..."
-            />
-            {formData.image_url && (
-              <img src={formData.image_url} alt="Preview" className="mt-2 w-24 h-24 object-cover rounded-lg" />
-            )}
-          </div>
+          {/* Imagem do Produto */}
+          <ImageUpload
+            value={formData.image_url}
+            onChange={(url) => setFormData({ ...formData, image_url: url })}
+            folder="products"
+            label="Imagem do Produto"
+          />
 
           {/* Switches */}
           <div className="flex items-center gap-6">
