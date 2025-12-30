@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { Product, ProductVariation } from '@/types';
+import { useCategoryAddons } from '@/hooks/useCategoryAddons';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
@@ -21,23 +22,28 @@ export function ProductListItem({ product, onClick, minPrice, variations }: Prod
   const displayPrice = minPrice ?? discountedPrice;
   const showFromPrice = minPrice !== undefined && minPrice < product.price;
   const hasVariations = variations && variations.length > 0;
+  const { data: categoryAddons } = useCategoryAddons(product.category_id ?? undefined);
+  const hasAddons = categoryAddons && categoryAddons.length > 0;
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
-    if (hasVariations) {
-      // Open modal for products with variations
+    // Se o produto tiver variações ou adicionais da categoria, abrir o modal de detalhes
+    if (hasVariations || hasAddons) {
       onClick();
-    } else {
-      // Direct add for simple products
-      addItem(product, 1);
-      toast.success(`${product.name} adicionado!`);
+      return;
     }
+
+    // Caso contrário, adicionar diretamente ao carrinho
+    addItem(product, 1);
+    toast.success(`${product.name} adicionado!`);
   };
+
+
+
 
   return (
     <div className="w-full bg-card border border-border rounded-lg p-3 flex gap-3 text-left transition-all active:scale-[0.98]">
-      {/* Image + Info - clickable to open details */}
+      {/* Imagem + Informações — clicável para abrir detalhes */}
       <button
         onClick={onClick}
         className="flex gap-3 flex-1 min-w-0 text-left"
@@ -95,7 +101,7 @@ export function ProductListItem({ product, onClick, minPrice, variations }: Prod
         </div>
       </button>
       
-      {/* Quick Add Button */}
+      {/* Botão de "Adicionar rápido" */}
       <button
         onClick={handleQuickAdd}
         className="flex-shrink-0 w-12 h-12 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full flex items-center justify-center self-center transition-colors active:scale-95"

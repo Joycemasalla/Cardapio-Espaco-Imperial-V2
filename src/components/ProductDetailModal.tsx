@@ -40,10 +40,10 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
   const [secondFlavorOpen, setSecondFlavorOpen] = useState(false);
   const [selectedAddons, setSelectedAddons] = useState<SelectedAddon[]>([]);
 
-  // Get addons for this product's category
+  // Buscar adicionais da categoria deste produto
   const { data: categoryAddons } = useCategoryAddons(product.category_id || undefined);
 
-  // Get pizzas for half-and-half selection
+  // Buscar pizzas para seleção meia a meia
   const { data: allProducts } = useProducts();
   const pizzaProducts = useMemo(() => {
     return allProducts?.filter(p => 
@@ -52,7 +52,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
     ) || [];
   }, [allProducts, product]);
 
-  // Check if this product has a "Grande" variation (for half-and-half option)
+  // Verifica se este produto tem uma variação "Grande" (para opção meia a meia)
   const hasLargeVariation = variations.some(v => 
     v.name.toLowerCase().includes('grande') || v.name.toLowerCase().includes('g')
   );
@@ -71,16 +71,16 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
     return product.price;
   }, [selectedVariation, hasPromotion, product]);
 
-  // Calculate addons total
+  // Calcular total dos adicionais
   const addonsTotal = useMemo(() => {
     return selectedAddons.reduce((sum, addon) => sum + addon.price, 0);
   }, [selectedAddons]);
 
-  // For half-and-half, use the higher price between the two flavors
+  // Para meia a meia, usar o maior preço entre os dois sabores
   const finalPrice = useMemo(() => {
     let basePrice = currentPrice;
     if (isHalfHalf && secondFlavor && selectedVariation) {
-      // Find the variation for the second flavor
+      // Encontrar a variação para o segundo sabor
       const secondFlavorPrice = selectedVariation.price; // Assume same size
       basePrice = Math.max(currentPrice, secondFlavorPrice);
     }
@@ -130,7 +130,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0 glass-effect border-primary/20">
-        {/* Image */}
+          {/* Imagem */}
         <div className="relative aspect-video">
           {product.image_url ? (
             <img 
@@ -160,7 +160,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
             <p className="text-muted-foreground text-sm">{product.description}</p>
           )}
 
-          {/* Size Variations */}
+          {/* Variações de tamanho */}
           {variations.length > 0 && (
             <div className="space-y-3">
               <Label className="text-base font-semibold">Escolha o tamanho</Label>
@@ -169,7 +169,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
                 onValueChange={(id) => {
                   const v = variations.find(v => v.id === id);
                   setSelectedVariation(v);
-                  // Reset half-half if not large
+                  // Resetar opção meia a meia se não for grande
                   if (v && !v.name.toLowerCase().includes('grande') && !v.name.toLowerCase().includes('g')) {
                     setIsHalfHalf(false);
                     setSecondFlavor(undefined);
@@ -193,7 +193,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
             </div>
           )}
 
-          {/* Half-and-Half Option (only for large pizza) */}
+          {/* Opção Meia a Meia (apenas para pizza grande) */}
           {hasLargeVariation && isLargeSelected && pizzaProducts.length > 0 && (
             <div className="space-y-3 border-t border-border pt-4">
               <div className="flex items-center justify-between">
@@ -241,7 +241,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
             </div>
           )}
 
-          {/* Addons Section */}
+          {/* Seção de adicionais */}
           {categoryAddons && categoryAddons.length > 0 && (
             <div className="space-y-3 border-t border-border pt-4">
               <Label className="text-base font-semibold">🧀 Adicionais</Label>
@@ -272,7 +272,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
             </div>
           )}
 
-          {/* Quantity */}
+          {/* Quantidade */}
           <div className="flex items-center justify-between border-t border-border pt-4">
             <Label className="text-base font-semibold">Quantidade</Label>
             <div className="flex items-center gap-3">
@@ -296,7 +296,7 @@ export function ProductDetailModal({ product, variations, isOpen, onClose }: Pro
             </div>
           </div>
 
-          {/* Add to Cart */}
+          {/* Adicionar ao carrinho */}
           <Button 
             onClick={handleAddToCart} 
             size="lg" 

@@ -34,7 +34,7 @@ export default function Index() {
     setSelectedCategory(categoryId);
   };
 
-  // Map variations to products
+  // Mapear variações para produtos
   const variationsByProductId = useMemo(() => {
     const map: Record<string, ProductVariation[]> = {};
     allVariations?.forEach(v => {
@@ -44,7 +44,7 @@ export default function Index() {
     return map;
   }, [allVariations]);
 
-  // Get minimum price for products with variations
+  // Obter preço mínimo para produtos com variações
   const getMinPrice = (productId: string): number | undefined => {
     const variations = variationsByProductId[productId];
     if (!variations || variations.length === 0) return undefined;
@@ -68,22 +68,22 @@ export default function Index() {
         </h2>
         
         {loadingProducts ? <>
-            {/* Mobile skeleton */}
+            {/* Esqueleto mobile */}
             <div className="space-y-3 md:hidden">
               {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="bg-card border border-border rounded-lg animate-pulse h-24" />)}
             </div>
-            {/* Desktop skeleton */}
+            {/* Esqueleto desktop */}
             <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {[1, 2, 3, 4, 5, 6, 7, 8].map(i => <div key={i} className="bg-card border border-border rounded-lg animate-pulse h-80" />)}
             </div>
           </> : products?.length === 0 ? <p className="text-center py-12 text-muted-foreground">
             Nenhum produto cadastrado nesta categoria
           </p> : <>
-            {/* Mobile: List view */}
+            {/* Mobile: visualização em lista */}
             <div className="space-y-3 md:hidden">
               {products?.map(product => <ProductListItem key={product.id} product={product} onClick={() => handleProductClick(product)} minPrice={getMinPrice(product.id)} variations={variationsByProductId[product.id]} />)}
             </div>
-            {/* Desktop: Grid view */}
+            {/* Desktop: visualização em grade */}
             <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {products?.map(product => <ProductCard key={product.id} product={product} onClick={() => handleProductClick(product)} minPrice={getMinPrice(product.id)} />)}
             </div>
@@ -96,7 +96,7 @@ export default function Index() {
       <ScrollToTopButton />
       <WhatsAppFloatingButton />
 
-      {/* Product Detail Modal */}
+      {/* Modal de detalhes do produto */}
       {selectedProduct && <ProductDetailModal product={selectedProduct} variations={variationsByProductId[selectedProduct.id] || []} isOpen={!!selectedProduct} onClose={() => setSelectedProduct(null)} />}
     </div>;
 }
